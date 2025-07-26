@@ -1,0 +1,19 @@
+# ===================================
+# Requirements para YouTube Downloader Pro - Kivy Desktop
+# ===================================
+
+# Framework de interfaz gráfica
+kivy==2.2.0
+kivymd==1.1.1
+
+# YouTube y video processing
+yt-dlp>=2023.7.6
+ffmpeg-python>=0.2.0
+
+# Utilities y dependencias
+requests>=2.31.0
+pillow>=10.0.0
+packaging>=23.0
+
+# Para mejor interfaz
+plyer>=2.1.0  # Notificaciones nativas del sistema

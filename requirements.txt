@@ -1,0 +1,23 @@
+yt-dlp>=2023.7.6
+pillow>=9.0.0
+requests>=2.28.0
+# 📋 Requerimientos para YouTube Downloader Pro - Streamlit
+
+# Core dependencies  
+streamlit>=1.28.0
+yt-dlp>=2023.7.6
+ffmpeg-python>=0.2.0
+
+# Additional utilities
+pathlib2>=2.3.7
+python-dateutil>=2.8.2
+
+# For better performance and caching
+streamlit-option-menu>=0.3.6
+plotly>=5.15.0  # Para futuros gráficos de estadísticas
+
+# Development tools (optional)
+streamlit-ace>=0.1.1  # Para mostrar código JSON formateado
+
+# Legacy tkinter version dependencies (mantener por compatibilidad)
+# tkinter - viene incluido con Python>=0.2.0
