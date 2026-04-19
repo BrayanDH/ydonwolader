@@ -125,24 +125,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- TOP BAR SIMULATION ---
-top_col1, top_col2, top_col3 = st.columns([1, 4, 1.5])
-with top_col1:
-    st.markdown('<div style="color: #28D8A1; font-weight: bold; font-size: 1.2rem; padding: 5px;">YTWorker Pro</div>', unsafe_allow_html=True)
-with top_col2:
-    # Simular menú horizontal
-    st.markdown("""
-    <div style="display: flex; gap: 20px; color: #A0A0A5; font-size: 0.9rem; padding: 10px;">
-        <span style="color: #28D8A1; border-bottom: 2px solid #28D8A1; padding-bottom: 5px; cursor: pointer;">Medios</span>
-        <span style="cursor: pointer;">Audio</span>
-        <span style="cursor: pointer;">Títulos</span>
-        <span style="cursor: pointer;">Transiciones</span>
-        <span style="cursor: pointer;">Efectos</span>
-    </div>
-    """, unsafe_allow_html=True)
-with top_col3:
-    st.button("EXPORTAR VIDEO", type="primary")
-
+# --- HEADER ---
+st.markdown('<div style="color: #28D8A1; font-weight: bold; font-size: 1.8rem; padding-bottom: 0.5rem;">YTWorker Pro</div>', unsafe_allow_html=True)
 st.markdown("---")
 
 # Funciones auxiliares
@@ -272,8 +256,7 @@ if 'downloaded_youtube_info' not in st.session_state:
 
 # --- Sidebar Navigation ---
 with st.sidebar:
-    st.markdown('<h2 style="text-align: center; color: #28D8A1; margin-bottom: 0;">YTWorker Pro</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; color: #718096; font-size: 0.8rem; margin-bottom: 1rem;">Video Editor System</p>', unsafe_allow_html=True)
+    st.markdown("### Navegación")
     
     # Navegación compacta en el sidebar
     page = st.radio(
