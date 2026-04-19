@@ -281,6 +281,8 @@ if 'downloaded_youtube_info' not in st.session_state:
     st.session_state.downloaded_youtube_info = None
 if 'downloaded_youtube_id' not in st.session_state:
     st.session_state.downloaded_youtube_id = None
+if 'clip_counter' not in st.session_state:
+    st.session_state.clip_counter = 1
 
 # --- Sidebar Navigation ---
 with st.sidebar:
@@ -417,9 +419,9 @@ elif page == "Crear Clips YouTube":
                 st.session_state.video_info = None; st.session_state.current_clip_url = ""; st.rerun()
 
         if st.session_state.video_info:
-            st.markdown("---")
             st.markdown("#### Ajustes")
-            clip_name = st.text_input("Nombre del Clip:", value=f"clip_{datetime.now().strftime('%m%d_%H%M')}")
+            default_name = f"clip_{datetime.now().strftime('%m%d_%H%M')}_{st.session_state.clip_counter}"
+            clip_name = st.text_input("Nombre del Clip:", value=default_name)
             output_format = st.selectbox("Formato:", ["mp4", "webm", "mkv"])
             if st.button("GENERAR CLIP", use_container_width=True, type="primary"):
                 st.session_state.trigger_yt_clip = True
@@ -510,6 +512,8 @@ elif page == "Crear Clips YouTube":
                             if success:
                                 st.success(f"✅ Clip guardado en {download_dir}/")
                                 st.session_state.clips_created.append({'name': clip_name, 'duration': format_duration(end_s-start_s), 'path': str(out_p)})
+                                st.session_state.clip_counter += 1
+                                st.rerun()
                             else: st.error(err)
                         else:
                             st.error("❌ No se encontró el archivo descargado.")
