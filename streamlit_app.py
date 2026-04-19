@@ -553,7 +553,8 @@ elif page == "Procesar Videos Locales":
 
         if st.session_state.get('local_video_info'):
             st.markdown("---")
-            l_clip_name = st.text_input("Nombre:", value=f"edit_{datetime.now().strftime('%H%M')}")
+            l_default_name = f"edit_{datetime.now().strftime('%H%M')}_{st.session_state.clip_counter}"
+            l_clip_name = st.text_input("Nombre:", value=l_default_name)
             if st.button("PROCESAR CLIP", use_container_width=True, type="primary"):
                 st.session_state.trigger_local_clip = True
 
@@ -589,6 +590,8 @@ elif page == "Procesar Videos Locales":
                         if success:
                             st.success(f"Clip guardado: {out_p.name}")
                             st.session_state.clips_created.append({'name': l_clip_name, 'duration': format_duration(le-ls), 'path': str(out_p)})
+                            st.session_state.clip_counter += 1
+                            st.rerun()
                         else: st.error(err)
         else:
             st.info("Sube un video local para comenzar.")
