@@ -311,7 +311,7 @@ if 'youtube_quick_counter' not in st.session_state:
     st.session_state.youtube_quick_counter = 0
 # URL del video actual para clips
 if 'current_clip_url' not in st.session_state:
-    st.session_state.current_clip_url = None
+    st.session_state.current_clip_url = ""
 # Video descargado de YouTube para clips
 if 'downloaded_youtube_path' not in st.session_state:
     st.session_state.downloaded_youtube_path = None
@@ -421,7 +421,7 @@ elif page == "✂️ Crear Clips YouTube":
                     if info: st.session_state.video_info = info; st.rerun()
         with c2:
             if st.button("🗑️ Reset", use_container_width=True):
-                st.session_state.video_info = None; st.rerun()
+                st.session_state.video_info = None; st.session_state.current_clip_url = ""; st.rerun()
 
         if st.session_state.video_info:
             st.markdown("---")
@@ -438,7 +438,10 @@ elif page == "✂️ Crear Clips YouTube":
             
             # Embed
             import re
-            m = re.search(r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)', st.session_state.current_clip_url)
+            m = None
+            if st.session_state.current_clip_url:
+                m = re.search(r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)', st.session_state.current_clip_url)
+            
             if m:
                 st.markdown(f'<div class="video-container"><iframe width="100%" height="380" src="https://www.youtube.com/embed/{m.group(1)}" frameborder="0" allowfullscreen></iframe></div>', unsafe_allow_html=True)
 
@@ -456,19 +459,29 @@ elif page == "✂️ Crear Clips YouTube":
                 with st.spinner("Descargando y Cortando..."):
                     try:
                         temp_dir = Path("temp_clips"); temp_dir.mkdir(exist_ok=True)
-                        tmp_out = str(temp_dir / f"tmp_{int(time.time())}.mp4")
-                        ydl_opts = {'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]', 'outtmpl': tmp_out, 'restrictfilenames': True}
-                        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                            ydl.download([st.session_state.current_clip_url])
+                        # Usar plantilla sin extensión fija para que yt-dlp maneje el formato final
+                        outtmpl = str(temp_dir / f"tmp_{int(time.time())}.%(ext)s")
+                        ydl_opts = {
+                            'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+                            'outtmpl': outtmpl,
+                            'restrictfilenames': True
+                        }
                         
-                        out_dir = Path(download_dir); out_dir.mkdir(exist_ok=True)
-                        out_p = out_dir / f"{clip_name}.{output_format}"
-                        success, err = create_clip_ffmpeg(tmp_out, seconds_to_time(start_s), seconds_to_time(end_s), str(out_p))
-                        if success:
-                            st.success(f"✅ Clip guardado en {download_dir}/")
-                            st.session_state.clips_created.append({'name': clip_name, 'duration': format_duration(end_s-start_s), 'path': str(out_p)})
-                            if os.path.exists(tmp_out): os.remove(tmp_out)
-                        else: st.error(err)
+                        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                            info = ydl.extract_info(st.session_state.current_clip_url, download=True)
+                            downloaded_path = ydl.prepare_filename(info)
+                        
+                        if os.path.exists(downloaded_path):
+                            out_dir = Path(download_dir); out_dir.mkdir(exist_ok=True)
+                            out_p = out_dir / f"{clip_name}.{output_format}"
+                            success, err = create_clip_ffmpeg(downloaded_path, seconds_to_time(start_s), seconds_to_time(end_s), str(out_p))
+                            if success:
+                                st.success(f"✅ Clip guardado en {download_dir}/")
+                                st.session_state.clips_created.append({'name': clip_name, 'duration': format_duration(end_s-start_s), 'path': str(out_p)})
+                                if os.path.exists(downloaded_path): os.remove(downloaded_path)
+                            else: st.error(err)
+                        else:
+                            st.error("❌ No se encontró el archivo descargado.")
                     except Exception as e: st.error(str(e))
         else:
             st.info("👈 Ingresa una URL de YouTube a la derecha para comenzar.")
