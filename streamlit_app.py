@@ -17,6 +17,25 @@ from pathlib import Path
 from datetime import datetime, time as dt_time, timedelta
 import tempfile
 import shutil
+import tkinter as tk
+from tkinter import filedialog
+
+# Configuración de archivos
+CONFIG_FILE = Path("config.json")
+
+def load_config():
+    if CONFIG_FILE.exists():
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        except: pass
+    return {"download_dir": "downloads"}
+
+def save_config(config_data):
+    try:
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config_data, f)
+    except: pass
 
 # Configuración de página
 st.set_page_config(
@@ -222,6 +241,9 @@ def create_clip_ffmpeg(video_path, start_time, end_time, output_path):
         return False, str(e)
 
 # Inicializar estado de la sesión
+config = load_config()
+if 'download_dir' not in st.session_state:
+    st.session_state.download_dir = config.get("download_dir", "downloads")
 if 'video_info' not in st.session_state:
     st.session_state.video_info = None
 if 'downloaded_video_path' not in st.session_state:
@@ -274,7 +296,32 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("### 📁 Configuración")
-    download_dir = st.text_input("Directorio de descarga:", value="downloads", help="Donde se guardarán los archivos")
+    
+    def update_config():
+        save_config({"download_dir": st.session_state.new_download_dir})
+        st.session_state.download_dir = st.session_state.new_download_dir
+
+    download_dir_input = st.text_input(
+        "Directorio de descarga:", 
+        value=st.session_state.download_dir, 
+        help="Donde se guardarán los archivos",
+        key="new_download_dir",
+        on_change=update_config
+    )
+    download_dir = st.session_state.download_dir
+    
+    def select_folder():
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes('-topmost', True)
+        folder = filedialog.askdirectory(initialdir=st.session_state.download_dir)
+        root.destroy()
+        if folder:
+            st.session_state.download_dir = folder
+            save_config({"download_dir": folder})
+            st.rerun()
+
+    st.button("📁 Seleccionar Carpeta", on_click=select_folder, use_container_width=True)
     
     # Mostrar clips creados en el sidebar (compacto)
     if st.session_state.clips_created:
