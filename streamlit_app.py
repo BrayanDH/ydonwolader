@@ -201,6 +201,7 @@ def get_video_info(url):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
+            'restrictfilenames': True,
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -254,7 +255,7 @@ def get_basic_video_duration(video_path):
     try:
         cmd = ["ffprobe", "-v", "quiet", "-show_entries", "format=duration", 
                "-of", "csv=p=0", video_path]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=10)
         if result.returncode == 0:
             return float(result.stdout.strip())
     except:
@@ -275,7 +276,7 @@ def create_clip_ffmpeg(video_path, start_time, end_time, output_path):
             output_path
         ]
         
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
         return result.returncode == 0, result.stderr
     except Exception as e:
         return False, str(e)
@@ -683,11 +684,12 @@ if page == "📥 Descargar Videos":
                 
                 # Configurar yt-dlp con opciones universales
                 ydl_opts = {
-                    'outtmpl': f"{download_dir}/%(title)s.%(ext)s",
+                    'outtmpl': f"{download_dir}/%(title)s.%(id)s.%(ext)s",
                     'format': quality_map[quality],
                     'noplaylist': True,
                     'extract_flat': False,
                     'writeinfojson': True,  # Guardar metadata
+                    'restrictfilenames': True,
                 }
                 
                 # Configurar audio
@@ -882,6 +884,7 @@ elif page == "✂️ Crear Clips YouTube":
                     'format': 'best[height<=720]/best',
                     'outtmpl': str(download_dir / '%(title)s.%(ext)s'),
                     'noplaylist': True,
+                    'restrictfilenames': True,
                 }
                 
                 # Hook para progreso
@@ -1104,8 +1107,9 @@ elif page == "✂️ Crear Clips YouTube":
                         
                         ydl_opts = {
                             'format': 'best[height<=720]/best',
-                            'outtmpl': str(temp_dir / '%(title)s.%(ext)s'),
-                            'noplaylist': True
+                            'outtmpl': str(temp_dir / f'auto_{int(time.time())}_%(id)s.%(ext)s'),
+                            'noplaylist': True,
+                            'restrictfilenames': True,
                         }
                         
                         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -1272,7 +1276,7 @@ elif page == "📁 Procesar Videos Locales":
                         "-show_format", "-show_streams", st.session_state.local_video_path
                     ]
                     
-                    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                    result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30)
                     
                     if result.returncode == 0:
                         probe_data = json.loads(result.stdout)
@@ -1558,7 +1562,7 @@ elif page == "📁 Procesar Videos Locales":
                         progress_bar.progress(30)
                         
                         # Ejecutar comando
-                        result = subprocess.run(cmd, capture_output=True, text=True)
+                        result = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
                         
                         progress_bar.progress(80)
                         

@@ -70,7 +70,7 @@ def check_dependencies():
     
     # Verificar FFmpeg
     try:
-        result = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True)
+        result = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True, encoding='utf-8', errors='replace')
         if result.returncode != 0:
             missing_deps.append("ffmpeg")
     except FileNotFoundError:

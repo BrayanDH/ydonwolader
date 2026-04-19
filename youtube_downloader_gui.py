@@ -817,7 +817,24 @@ Características:
                 self.root.after(0, self._mostrar_info_video_clip, info)
                 
         except Exception as e:
-            error_msg = f"❌ Error obteniendo información: {str(e)}"
+            error_str = str(e)
+            
+            # Detectar tipos específicos de errores
+            if "Only images are available" in error_str or "format is not available" in error_str.lower():
+                error_msg = ("❌ Video protegido o restringido\n\n"
+                           "Este video no puede ser procesado porque:\n"
+                           "• YouTube lo tiene protegido o restringido\n"
+                           "• Solo hay imágenes disponibles\n"
+                           "• El contenido es de acceso limitado")
+            elif "nsig extraction failed" in error_str.lower():
+                error_msg = ("❌ Error de extracción de firma\n\n"
+                           "Intenta actualizar yt-dlp:\n"
+                           "pip install --upgrade yt-dlp")
+            elif "HTTP Error 404" in error_str or "Video not found" in error_str:
+                error_msg = "❌ Video no encontrado. Verifica que la URL sea correcta."
+            else:
+                error_msg = f"❌ Error obteniendo información: {error_str}"
+            
             self.root.after(0, lambda: self.progreso_clip_var.set(error_msg))
             self.root.after(0, lambda: messagebox.showerror("Error", error_msg))
         
@@ -882,8 +899,10 @@ Características:
             # Configuración para descarga temporal
             ydl_opts = {
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
-                'format': 'best[height<=720]',  # Calidad media para clips
+                'format': 'bestvideo[height<=720]/best[height<=720]/bestvideo/best',
                 'noplaylist': True,
+                'quiet': False,
+                'no_warnings': False
             }
             
             self.root.after(0, lambda: self.progreso_clip_var.set("📥 Descargando video completo..."))
@@ -904,7 +923,23 @@ Características:
                 raise Exception("No se encontró el archivo descargado")
                 
         except Exception as e:
-            error_msg = f"❌ Error descargando video: {str(e)}"
+            error_str = str(e)
+            
+            # Detectar tipos específicos de errores
+            if "Only images are available" in error_str or "format is not available" in error_str.lower():
+                error_msg = ("❌ Video protegido o restringido\n\n"
+                           "Este video no puede ser descargado porque:\n"
+                           "• YouTube lo tiene protegido o restringido\n"
+                           "• Solo hay imágenes disponibles para descarga\n"
+                           "• El contenido puede ser de acceso limitado\n\n"
+                           "Intenta con otro video de YouTube.")
+            elif "nsig extraction failed" in error_str.lower():
+                error_msg = ("❌ Error de extracción de firma\n\n"
+                           "Intenta actualizar yt-dlp:\n"
+                           "pip install --upgrade yt-dlp")
+            else:
+                error_msg = f"❌ Error descargando video: {error_str}"
+            
             self.root.after(0, lambda: self.progreso_clip_var.set(error_msg))
             self.root.after(0, lambda: messagebox.showerror("Error", error_msg))
         
@@ -1041,7 +1076,7 @@ Características:
             print(f"🔧 DEBUG: Comando ffmpeg: {' '.join(cmd)}")
             
             # Ejecutar comando
-            resultado = subprocess.run(cmd, capture_output=True, text=True)
+            resultado = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
             
             print(f"📊 DEBUG: Código de retorno: {resultado.returncode}")
             if resultado.stderr:
@@ -1094,10 +1129,13 @@ Características:
             print(f"📥 DEBUG: Descargando video de {url}")
             
             # Configurar yt-dlp para descarga temporal
+            # Usar formato flexible que intenta mejor opción pero fallback a alternativas
             ydl_opts = {
-                'format': 'best[height<=720]/best',  # Mejor calidad hasta 720p
+                'format': 'bestvideo[height<=720]/best[height<=720]/bestvideo/best',
                 'outtmpl': str(temp_dir / '%(title)s.%(ext)s'),
-                'noplaylist': True
+                'noplaylist': True,
+                'quiet': False,
+                'no_warnings': False
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -1148,7 +1186,7 @@ Características:
             print(f"🔧 DEBUG: Comando ffmpeg: {' '.join(cmd)}")
             
             # Ejecutar comando
-            resultado = subprocess.run(cmd, capture_output=True, text=True)
+            resultado = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
             
             print(f"📊 DEBUG: Código de retorno: {resultado.returncode}")
             if resultado.stderr:
@@ -1193,7 +1231,29 @@ Características:
             self.root.after(0, lambda: self.progreso_clip_var.set(error_msg))
             self.root.after(0, lambda: messagebox.showerror("Error", error_msg))
         except Exception as e:
-            error_msg = f"❌ Error en proceso automático: {str(e)}"
+            error_str = str(e)
+            
+            # Detectar tipos específicos de errores
+            if "Only images are available" in error_str or "format is not available" in error_str.lower():
+                error_msg = ("❌ Video protegido o restringido\n\n"
+                           "Este video no puede ser descargado porque:\n"
+                           "• YouTube lo tiene protegido o restringido\n"
+                           "• Solo hay imágenes disponibles para descarga\n"
+                           "• El contenido puede ser de acceso limitado\n\n"
+                           "Intenta con otro video de YouTube.")
+            elif "nsig extraction failed" in error_str.lower():
+                error_msg = ("❌ Error de extracción de firma\n\n"
+                           "Intenta actualizar yt-dlp:\n"
+                           "pip install --upgrade yt-dlp")
+            elif "HTTP Error 403" in error_str or "HTTP Error 404" in error_str:
+                error_msg = ("❌ Error de acceso al video\n\n"
+                           "El video puede estar:\n"
+                           "• Privado o eliminado\n"
+                           "• Restringido por región\n"
+                           "• No disponible en tu país")
+            else:
+                error_msg = f"❌ Error en proceso automático: {error_str}"
+            
             print(f"💥 DEBUG: Excepción: {error_msg}")
             self.root.after(0, lambda: self.progreso_clip_var.set(error_msg))
             self.root.after(0, lambda: messagebox.showerror("Error", error_msg))
@@ -1289,7 +1349,7 @@ Características:
                 "-show_format", "-show_streams", archivo_path
             ]
             
-            resultado = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            resultado = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30)
             
             if resultado.returncode == 0:
                 import json
@@ -1465,7 +1525,7 @@ Características:
             print(f"🔧 DEBUG: Comando ffmpeg: {' '.join(cmd)}")
             
             # Ejecutar comando
-            resultado = subprocess.run(cmd, capture_output=True, text=True)
+            resultado = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
             
             print(f"📊 DEBUG: Código de retorno: {resultado.returncode}")
             if resultado.stderr:
@@ -1576,7 +1636,7 @@ Características:
             print(f"🔧 DEBUG: Comando ffmpeg: {' '.join(cmd)}")
             
             # Ejecutar comando
-            resultado = subprocess.run(cmd, capture_output=True, text=True)
+            resultado = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
             
             print(f"📊 DEBUG: Código de retorno: {resultado.returncode}")
             if resultado.stderr:

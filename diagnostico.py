@@ -47,13 +47,13 @@ def check_ffmpeg():
     print("-" * 20)
     
     try:
-        resultado = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True, timeout=5)
+        resultado = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=5)
         if resultado.returncode == 0:
             version_line = resultado.stdout.split('\n')[0]
             print(f"✅ {version_line}")
             
             # Verificar codecs
-            resultado_codecs = subprocess.run(["ffmpeg", "-codecs"], capture_output=True, text=True, timeout=5)
+            resultado_codecs = subprocess.run(["ffmpeg", "-codecs"], capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=5)
             if "h264" in resultado_codecs.stdout.lower():
                 print("✅ Codec H.264 disponible")
             if "aac" in resultado_codecs.stdout.lower():
