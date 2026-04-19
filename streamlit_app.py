@@ -29,169 +29,121 @@ st.set_page_config(
 # Estilos CSS personalizados
 st.markdown("""
 <style>
-    .main-header {
-        text-align: center;
-        background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-size: 3rem;
-        font-weight: bold;
-        margin-bottom: 2rem;
+    /* Filmora Dark Theme Core */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    
+    html, body, [data-testid="stAppViewContainer"] {
+        background-color: #0F0F13 !important;
+        font-family: 'Inter', sans-serif;
+        color: #E0E0E6;
+    }
+
+    [data-testid="stHeader"] {
+        background-color: #0F0F13 !important;
+    }
+
+    [data-testid="stSidebar"] {
+        background-color: #17171C !important;
+        border-right: 1px solid #2D2D35;
+    }
+
+    /* Filmora Cards & Panels */
+    .video-info-card, .timeline-container, .clip-preview {
+        background-color: #1B1B22 !important;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #2D2D35;
+        margin: 1rem 0;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     
     .video-info-card {
-        background-color: #f0f2f6;
-        padding: 1rem;
-        border-radius: 10px;
-        border-left: 4px solid #4ECDC4;
-        margin: 1rem 0;
+        border-left: 4px solid #28D8A1 !important;
     }
-    
-    .timeline-container {
-        background-color: #ffffff;
-        padding: 1rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin: 1rem 0;
-    }
-    
-    .clip-preview {
-        background-color: #e3f2fd;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-    }
-    
-    .success-box {
-        background-color: #d4edda;
-        color: #155724;
-        padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid #c3e6cb;
-        margin: 1rem 0;
-    }
-    
-    .error-box {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 1rem;
-        border-radius: 10px;
-        border: 1px solid #f5c6cb;
-        margin: 1rem 0;
-    }
-    
+
+    /* Filmora Teal Buttons */
     .stButton > button {
         width: 100%;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        font-weight: bold;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #2D2D35 !important;
+        color: #E0E0E6 !important;
+        border: 1px solid #3F3F48 !important;
+        border-radius: 4px !important;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    
+    /* Primary 'Export' Style Button in Filmora */
+    div.stButton > button[kind="primary"] {
+        background: #28D8A1 !important;
+        color: #0F0F13 !important;
+        border: none !important;
+        box-shadow: 0 0 10px rgba(40, 216, 161, 0.2);
+    }
+
+    div.stButton > button[kind="primary"]:hover {
+        background: #34E5AF !important;
+        box-shadow: 0 0 15px rgba(40, 216, 161, 0.4);
     }
     
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        background: linear-gradient(90deg, #5a67d8 0%, #6b46c1 100%);
+        border-color: #28D8A1 !important;
+        background-color: #25252C !important;
     }
-    
-    .stButton > button:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    /* Menu horizontal mejorado */
-    .menu-button {
-        text-align: center;
-        margin: 0 0.5rem;
-    }
-    
-    /* Mejorar inputs */
-    .stTextInput > div > div > input {
-        border-radius: 10px;
-        border: 2px solid #e2e8f0;
-        padding: 0.75rem;
-        font-size: 1rem;
-        transition: border-color 0.3s ease;
+
+    /* Custom Inputs */
+    .stTextInput > div > div > input, .stSelectbox > div > div > select {
+        background-color: #111116 !important;
+        color: #E0E0E6 !important;
+        border: 1px solid #2D2D35 !important;
+        border-radius: 4px !important;
     }
     
     .stTextInput > div > div > input:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        border-color: #28D8A1 !important;
+        box-shadow: 0 0 0 1px #28D8A1 !important;
     }
-    
-    /* Mejorar sliders */
+
+    /* Filmora Slider Styling */
     .stSlider > div > div > div > div {
-        background: linear-gradient(90deg, #667eea, #764ba2);
+        background: #28D8A1 !important;
     }
     
-    /* Mejorar selectbox */
-    .stSelectbox > div > div > select {
-        border-radius: 10px;
-        border: 2px solid #e2e8f0;
-        padding: 0.5rem;
-    }
-    
-    /* Contenedor principal */
-    .block-container {
-        padding-top: 2rem;
-        max-width: 1200px;
-    }
-    
-    /* Título de sección mejorado */
-    .section-title {
-        color: #2d3748;
-        font-size: 1.8rem;
-        font-weight: 600;
-        margin: 2rem 0 1rem 0;
-        text-align: center;
-        padding: 1rem;
-        background: linear-gradient(135deg, #f7fafc, #edf2f7);
-        border-radius: 10px;
-        border-left: 5px solid #667eea;
-    }
-    
-    .timeline-marker {
-        background-color: #FF6B6B;
-        height: 20px;
-        border-radius: 10px;
-        margin: 5px 0;
-    }
-    
-    /* Video centrado responsive */
+    /* Video Container Filmora Style */
     .video-container {
-        display: flex;
-        justify-content: center;
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-        border-radius: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background: #000000;
+        border: 1px solid #2D2D35;
+        border-radius: 8px;
+        padding: 4px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
-    
-    .video-container iframe {
-        border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        transition: transform 0.3s ease;
-    }
-    
-    .video-container iframe:hover {
-        transform: scale(1.02);
-    }
-    
-    /* Responsive video en móviles */
-    @media (max-width: 768px) {
-        .video-container iframe {
-            width: 100%;
-            height: 225px;
-        }
-    }
+
+    /* Hide redundant Streamlit UI */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
+
+# --- TOP BAR SIMULATION ---
+top_col1, top_col2, top_col3 = st.columns([1, 4, 1.5])
+with top_col1:
+    st.markdown('<div style="color: #28D8A1; font-weight: bold; font-size: 1.2rem; padding: 5px;">YTWorker Pro</div>', unsafe_allow_html=True)
+with top_col2:
+    # Simular menú horizontal
+    st.markdown("""
+    <div style="display: flex; gap: 20px; color: #A0A0A5; font-size: 0.9rem; padding: 10px;">
+        <span style="color: #28D8A1; border-bottom: 2px solid #28D8A1; padding-bottom: 5px; cursor: pointer;">Medios</span>
+        <span style="cursor: pointer;">Audio</span>
+        <span style="cursor: pointer;">Títulos</span>
+        <span style="cursor: pointer;">Transiciones</span>
+        <span style="cursor: pointer;">Efectos</span>
+    </div>
+    """, unsafe_allow_html=True)
+with top_col3:
+    st.button("EXPORTAR VIDEO", type="primary")
+
+st.markdown("---")
 
 # Funciones auxiliares
 @st.cache_data(ttl=3600)  # Cache por 1 hora
@@ -320,13 +272,13 @@ if 'downloaded_youtube_info' not in st.session_state:
 
 # --- Sidebar Navigation ---
 with st.sidebar:
-    st.markdown('<h2 style="text-align: center; color: #4ECDC4; margin-bottom: 0;">🎬 YTWorker Pro</h2>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; color: #718096; font-size: 0.8rem; margin-bottom: 1rem;">Video Editor Style Interface</p>', unsafe_allow_html=True)
+    st.markdown('<h2 style="text-align: center; color: #28D8A1; margin-bottom: 0;">YTWorker Pro</h2>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; color: #718096; font-size: 0.8rem; margin-bottom: 1rem;">Video Editor System</p>', unsafe_allow_html=True)
     
     # Navegación compacta en el sidebar
     page = st.radio(
         "Navegación",
-        ["📥 Descargar Videos", "✂️ Crear Clips YouTube", "📁 Procesar Videos Locales", "ℹ️ Información"],
+        ["Descargar Videos", "Crear Clips YouTube", "Procesar Videos Locales", "Información"],
         label_visibility="collapsed"
     )
     
@@ -346,12 +298,12 @@ with st.sidebar:
 # Mantener la lógica de la página activa
 page = st.session_state.active_page
 
-# ============# ==================== PÁGINA: DESCARGAR VIDEOS ====================
-if page == "📥 Descargar Videos":
+# ==================== PÁGINA: DESCARGAR VIDEOS ====================
+if page == "Descargar Videos":
     col_d1, col_d2 = st.columns([1, 1], gap="medium")
     
     with col_d1:
-        st.markdown("### 🔗 Proyecto de Descarga")
+        st.markdown("### Proyecto de Descarga")
         url = st.text_input("URL del Video (YT, TikTok, IG, etc):", placeholder="https://...")
         
         if url:
@@ -359,16 +311,16 @@ if page == "📥 Descargar Videos":
             if 'youtube' in url or 'youtu.be' in url: platform = "YouTube"
             elif 'tiktok' in url: platform = "TikTok"
             elif 'instagram' in url: platform = "Instagram"
-            st.caption(f"🌐 Plataforma: **{platform}**")
+            st.caption(f"Plataforma: **{platform}**")
         
-        if st.button("🔍 Analizar Video", use_container_width=True, type="primary") and url:
+        if st.button("Analizar Video", use_container_width=True, type="primary") and url:
             with st.spinner("Analizando..."):
                 st.session_state.video_info = get_video_info(url)
         
         if st.session_state.get('video_info'):
             info = st.session_state.video_info
-            st.markdown(f"**🎬 {info.get('title', 'Video')[:60]}...**")
-            st.caption(f"👤 {info.get('uploader', 'N/A')} • ⏱️ {format_duration(info.get('duration', 0))}")
+            st.markdown(f"**{info.get('title', 'Video')[:60]}...**")
+            st.caption(f"{info.get('uploader', 'N/A')} • {format_duration(info.get('duration', 0))}")
             if info.get('thumbnail'):
                 st.image(info['thumbnail'], width=280)
 
@@ -402,12 +354,12 @@ if page == "📥 Descargar Videos":
             except Exception as e: st.error(str(e))
 
 # ==================== PÁGINA: CREAR CLIPS YOUTUBE ====================
-elif page == "✂️ Crear Clips YouTube":
+elif page == "Crear Clips YouTube":
     col_editor, col_controls = st.columns([2, 1], gap="medium")
     
     with col_controls:
-        st.markdown("### 🛠️ Editor YouTube")
-        clip_url = st.text_input("🔗 URL de YouTube:", value=st.session_state.get('current_clip_url', ''))
+        st.markdown("### Editor YouTube")
+        clip_url = st.text_input("URL de YouTube:", value=st.session_state.get('current_clip_url', ''))
         
         if clip_url and clip_url.strip() != st.session_state.get('current_clip_url'):
             st.session_state.current_clip_url = clip_url.strip()
@@ -415,26 +367,26 @@ elif page == "✂️ Crear Clips YouTube":
 
         c1, c2 = st.columns(2)
         with c1:
-            if st.button("🔍 Cargar", use_container_width=True, type="primary"):
+            if st.button("Analizar", use_container_width=True, type="primary"):
                 with st.spinner("Leyendo..."):
                     info = get_video_info(st.session_state.current_clip_url)
                     if info: st.session_state.video_info = info; st.rerun()
         with c2:
-            if st.button("🗑️ Reset", use_container_width=True):
+            if st.button("Reset", use_container_width=True):
                 st.session_state.video_info = None; st.session_state.current_clip_url = ""; st.rerun()
 
         if st.session_state.video_info:
             st.markdown("---")
-            st.markdown("#### ⚙️ Ajustes")
+            st.markdown("#### Ajustes")
             clip_name = st.text_input("Nombre del Clip:", value=f"clip_{datetime.now().strftime('%m%d_%H%M')}")
             output_format = st.selectbox("Formato:", ["mp4", "webm", "mkv"])
-            if st.button("🎬 GENERAR CLIP", use_container_width=True, type="primary"):
+            if st.button("GENERAR CLIP", use_container_width=True, type="primary"):
                 st.session_state.trigger_yt_clip = True
 
     with col_editor:
         if st.session_state.video_info:
             info = st.session_state.video_info
-            st.markdown(f"#### 📺 {info.get('title', 'Video')[:70]}...")
+            st.markdown(f"#### Video: {info.get('title', 'Video')[:70]}...")
             
             # Embed
             import re
@@ -487,11 +439,11 @@ elif page == "✂️ Crear Clips YouTube":
             st.info("👈 Ingresa una URL de YouTube a la derecha para comenzar.")
 
 # ==================== PÁGINA: PROCESAR VIDEOS LOCALES ====================
-elif page == "📁 Procesar Videos Locales":
+elif page == "Procesar Videos Locales":
     col_l1, col_l2 = st.columns([1, 2], gap="medium")
     
     with col_l1:
-        st.markdown("### 📁 Archivo Local")
+        st.markdown("### Archivo Local")
         uploaded_file = st.file_uploader("Seleccionar video:", type=['mp4', 'mkv', 'mov', 'avi', 'webm'])
         
         if uploaded_file:
@@ -502,8 +454,8 @@ elif page == "📁 Procesar Videos Locales":
                     st.session_state.local_filename = uploaded_file.name
                     st.session_state.local_video_info = None
             
-            st.success(f"✅ {uploaded_file.name}")
-            if st.button("🔍 Analizar Video", use_container_width=True, type="primary"):
+            st.success(f"{uploaded_file.name}")
+            if st.button("Analizar Video", use_container_width=True, type="primary"):
                 with st.spinner("Analizando..."):
                     cmd = ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", st.session_state.local_video_path]
                     res = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', errors='replace')
@@ -519,7 +471,7 @@ elif page == "📁 Procesar Videos Locales":
         if st.session_state.get('local_video_info'):
             st.markdown("---")
             l_clip_name = st.text_input("Nombre:", value=f"edit_{datetime.now().strftime('%H%M')}")
-            if st.button("✂️ PROCESAR CLIP", use_container_width=True, type="primary"):
+            if st.button("PROCESAR CLIP", use_container_width=True, type="primary"):
                 st.session_state.trigger_local_clip = True
 
     with col_l2:
@@ -528,7 +480,7 @@ elif page == "📁 Procesar Videos Locales":
             if st.session_state.get('local_video_info'):
                 info = st.session_state.local_video_info
                 dur = info['duration']
-                st.markdown(f"**⏱️ Timeline** ({format_duration(dur)})")
+                st.markdown(f"**Timeline** ({format_duration(dur)})")
                 ls = st.slider("Inicio:", 0, int(dur)-1, 0, key="lc_s")
                 le = st.slider("Fin:", ls+1, int(dur), int(dur), key="lc_e")
                 
@@ -539,24 +491,24 @@ elif page == "📁 Procesar Videos Locales":
                         out_p = out_dir / f"{l_clip_name}.mp4"
                         success, err = create_clip_ffmpeg(st.session_state.local_video_path, seconds_to_time(ls), seconds_to_time(le), str(out_p))
                         if success:
-                            st.success(f"✅ Clip guardado: {out_p.name}")
+                            st.success(f"Clip guardado: {out_p.name}")
                             st.session_state.clips_created.append({'name': l_clip_name, 'duration': format_duration(le-ls), 'path': str(out_p)})
                         else: st.error(err)
         else:
-            st.info("👈 Sube un video local para comenzar.")
+            st.info("Sube un video local para comenzar.")
 
 # ==================== PÁGINA: INFORMACIÓN ====================
-elif page == "ℹ️ Información":
-    st.header("ℹ️ Información")
+elif page == "Información":
+    st.header("Información")
     st.markdown("""
-    ### 🎬 YTWorker Pro - Video Editor Mode
+    ### YTWorker Pro - Video Editor System
     Interfaz profesional para gestión de videos y creación de clips.
     - **Descargar:** Obtén videos de YouTube, TikTok, IG, etc.
     - **Creator:** Recorta clips específicos de YouTube con timeline visual.
     - **Local:** Procesa tus propios archivos de video.
     """)
     if st.session_state.get('clips_created'):
-        st.subheader("📋 Clips Recientes")
+        st.subheader("Clips Recientes")
         for clip in st.session_state.clips_created:
             st.write(f"- {clip['name']} ({clip['duration']})")
 
