@@ -279,6 +279,8 @@ if 'downloaded_youtube_path' not in st.session_state:
     st.session_state.downloaded_youtube_path = None
 if 'downloaded_youtube_info' not in st.session_state:
     st.session_state.downloaded_youtube_info = None
+if 'downloaded_youtube_id' not in st.session_state:
+    st.session_state.downloaded_youtube_id = None
 
 # --- Sidebar Navigation ---
 with st.sidebar:
@@ -460,29 +462,41 @@ elif page == "Crear Clips YouTube":
             
             if st.session_state.get('trigger_yt_clip'):
                 st.session_state.trigger_yt_clip = False
-                with st.spinner("Descargando y Cortando..."):
+                with st.spinner("Procesando..."):
                     try:
                         temp_dir = Path("temp_clips"); temp_dir.mkdir(exist_ok=True)
-                        # Usar plantilla sin extensión fija para que yt-dlp maneje el formato final
-                        outtmpl = str(temp_dir / f"tmp_{int(time.time())}.%(ext)s")
-                        ydl_opts = {
-                            'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
-                            'outtmpl': outtmpl,
-                            'restrictfilenames': True
-                        }
+                        video_id = info.get('id', 'unknown')
                         
-                        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                            info = ydl.extract_info(st.session_state.current_clip_url, download=True)
-                            downloaded_path = ydl.prepare_filename(info)
+                        downloaded_path = None
+                        # Búsqueda robusta: Si existe cualquier archivo con este ID en la carpeta temp
+                        possible_cached = list(temp_dir.glob(f"{video_id}.*"))
                         
-                        if os.path.exists(downloaded_path):
+                        if possible_cached:
+                            downloaded_path = str(possible_cached[0])
+                            st.caption(f"⚡ Video detectado en local: {possible_cached[0].name}")
+                        else:
+                            # Descargar si no está en cache local
+                            outtmpl = str(temp_dir / f"{video_id}.%(ext)s")
+                            ydl_opts = {
+                                'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+                                'outtmpl': outtmpl,
+                                'restrictfilenames': True
+                            }
+                            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                                d_info = ydl.extract_info(st.session_state.current_clip_url, download=True)
+                                downloaded_path = ydl.prepare_filename(d_info)
+                                
+                                # Guardar en cache para el siguiente clip
+                                st.session_state.downloaded_youtube_path = downloaded_path
+                                st.session_state.downloaded_youtube_id = video_id
+                        
+                        if downloaded_path and os.path.exists(downloaded_path):
                             out_dir = Path(download_dir); out_dir.mkdir(exist_ok=True)
                             out_p = out_dir / f"{clip_name}.{output_format}"
                             success, err = create_clip_ffmpeg(downloaded_path, seconds_to_time(start_s), seconds_to_time(end_s), str(out_p))
                             if success:
                                 st.success(f"✅ Clip guardado en {download_dir}/")
                                 st.session_state.clips_created.append({'name': clip_name, 'duration': format_duration(end_s-start_s), 'path': str(out_p)})
-                                if os.path.exists(downloaded_path): os.remove(downloaded_path)
                             else: st.error(err)
                         else:
                             st.error("❌ No se encontró el archivo descargado.")
