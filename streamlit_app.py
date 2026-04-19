@@ -14,7 +14,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, time, timedelta
 import tempfile
 import shutil
 
@@ -398,13 +398,30 @@ elif page == "Crear Clips YouTube":
                 st.markdown(f'<div class="video-container"><iframe width="100%" height="380" src="https://www.youtube.com/embed/{m.group(1)}" frameborder="0" allowfullscreen></iframe></div>', unsafe_allow_html=True)
 
             # Timeline
-            duration = info.get('duration', 0)
-            st.markdown(f"**⏱️ Timeline** ({format_duration(duration)})")
-            t1, t2 = st.columns(2)
-            with t1: start_s = st.slider("In:", 0, int(duration)-1, st.session_state.youtube_quick_start, key="yt_s")
-            with t2: end_s = st.slider("Out:", start_s+1, int(duration), max(st.session_state.youtube_quick_end, start_s+1), key="yt_e")
+            duration = int(info.get('duration', 0))
+            st.markdown(f"**Timeline** ({format_duration(duration)})")
             
-            st.caption(f"📐 Clip: **{seconds_to_time(start_s)}** ➔ **{seconds_to_time(end_s)}** ({format_duration(end_s - start_s)})")
+            # Formatear el slider con tiempo real
+            start_dt = time(int(st.session_state.youtube_quick_start // 3600), int((st.session_state.youtube_quick_start % 3600) // 60), int(st.session_state.youtube_quick_start % 60))
+            end_val = min(st.session_state.youtube_quick_end, duration)
+            end_dt = time(int(end_val // 3600), int((end_val % 3600) // 60), int(end_val % 60))
+            
+            max_dt = time(int(duration // 3600), int((duration % 3600) // 60), int(duration % 60))
+            
+            # Slider de rango profesional
+            time_range = st.slider(
+                "Rango del Clip:",
+                min_value=time(0,0,0),
+                max_value=max_dt,
+                value=(start_dt, end_dt),
+                format="HH:mm:ss",
+                step=timedelta(seconds=1)
+            )
+            
+            start_s = time_range[0].hour * 3600 + time_range[0].minute * 60 + time_range[0].second
+            end_s = time_range[1].hour * 3600 + time_range[1].minute * 60 + time_range[1].second
+            
+            st.caption(f"Selección: **{seconds_to_time(start_s)}** ➔ **{seconds_to_time(end_s)}** ({format_duration(end_s - start_s)})")
             
             if st.session_state.get('trigger_yt_clip'):
                 st.session_state.trigger_yt_clip = False
@@ -479,10 +496,23 @@ elif page == "Procesar Videos Locales":
             st.video(st.session_state.local_video_path)
             if st.session_state.get('local_video_info'):
                 info = st.session_state.local_video_info
-                dur = info['duration']
+                dur = int(info['duration'])
                 st.markdown(f"**Timeline** ({format_duration(dur)})")
-                ls = st.slider("Inicio:", 0, int(dur)-1, 0, key="lc_s")
-                le = st.slider("Fin:", ls+1, int(dur), int(dur), key="lc_e")
+                
+                max_dt = time(int(dur // 3600), int((dur % 3600) // 60), int(dur % 60))
+                
+                # Slider de rango para video local
+                l_range = st.slider(
+                    "Selección de Tiempo:",
+                    min_value=time(0,0,0),
+                    max_value=max_dt,
+                    value=(time(0,0,0), max_dt),
+                    format="HH:mm:ss",
+                    step=timedelta(seconds=1)
+                )
+                
+                ls = l_range[0].hour * 3600 + l_range[0].minute * 60 + l_range[0].second
+                le = l_range[1].hour * 3600 + l_range[1].minute * 60 + l_range[1].second
                 
                 if st.session_state.get('trigger_local_clip'):
                     st.session_state.trigger_local_clip = False
