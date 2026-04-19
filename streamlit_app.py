@@ -119,15 +119,19 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
+    /* Safe top spacing to avoid cutting off content */
+    .block-container {
+        padding-top: 4rem !important;
+        padding-bottom: 0rem !important;
+    }
+
     /* Hide redundant Streamlit UI */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER ---
-st.markdown('<div style="color: #28D8A1; font-weight: bold; font-size: 1.8rem; padding-bottom: 0.5rem;">YTWorker Pro</div>', unsafe_allow_html=True)
-st.markdown("---")
+
 
 # Funciones auxiliares
 @st.cache_data(ttl=3600)  # Cache por 1 hora
@@ -256,6 +260,7 @@ if 'downloaded_youtube_info' not in st.session_state:
 
 # --- Sidebar Navigation ---
 with st.sidebar:
+    st.markdown('<div style="color: #28D8A1; font-weight: bold; font-size: 1.8rem; margin-bottom: 1rem;">YTWorker Pro</div>', unsafe_allow_html=True)
     st.markdown("### Navegación")
     
     # Navegación compacta en el sidebar
