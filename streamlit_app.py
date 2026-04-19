@@ -14,7 +14,7 @@ import os
 import threading
 import time
 from pathlib import Path
-from datetime import datetime, time, timedelta
+from datetime import datetime, time as dt_time, timedelta
 import tempfile
 import shutil
 
@@ -390,16 +390,16 @@ elif page == "Crear Clips YouTube":
             st.markdown(f"**Timeline** ({format_duration(duration)})")
             
             # Formatear el slider con tiempo real
-            start_dt = time(int(st.session_state.youtube_quick_start // 3600), int((st.session_state.youtube_quick_start % 3600) // 60), int(st.session_state.youtube_quick_start % 60))
+            start_dt = dt_time(int(st.session_state.youtube_quick_start // 3600), int((st.session_state.youtube_quick_start % 3600) // 60), int(st.session_state.youtube_quick_start % 60))
             end_val = min(st.session_state.youtube_quick_end, duration)
-            end_dt = time(int(end_val // 3600), int((end_val % 3600) // 60), int(end_val % 60))
+            end_dt = dt_time(int(end_val // 3600), int((end_val % 3600) // 60), int(end_val % 60))
             
-            max_dt = time(int(duration // 3600), int((duration % 3600) // 60), int(duration % 60))
+            max_dt = dt_time(int(duration // 3600), int((duration % 3600) // 60), int(duration % 60))
             
             # Slider de rango profesional
             time_range = st.slider(
                 "Rango del Clip:",
-                min_value=time(0,0,0),
+                min_value=dt_time(0,0,0),
                 max_value=max_dt,
                 value=(start_dt, end_dt),
                 format="HH:mm:ss",
@@ -487,14 +487,14 @@ elif page == "Procesar Videos Locales":
                 dur = int(info['duration'])
                 st.markdown(f"**Timeline** ({format_duration(dur)})")
                 
-                max_dt = time(int(dur // 3600), int((dur % 3600) // 60), int(dur % 60))
+                max_dt = dt_time(int(dur // 3600), int((dur % 3600) // 60), int(dur % 60))
                 
                 # Slider de rango para video local
                 l_range = st.slider(
                     "Selección de Tiempo:",
-                    min_value=time(0,0,0),
+                    min_value=dt_time(0,0,0),
                     max_value=max_dt,
-                    value=(time(0,0,0), max_dt),
+                    value=(dt_time(0,0,0), max_dt),
                     format="HH:mm:ss",
                     step=timedelta(seconds=1)
                 )
