@@ -369,8 +369,12 @@ if page == "Descargar Videos":
         if st.button("🚀 INICIAR DESCARGA", use_container_width=True, type="primary") and url:
             status_text = st.empty()
             try:
-                q_fmt = f"best[height<={quality[:-1]}]" if 'p' in quality else quality
-                if audio_only: q_fmt = "bestaudio/best"
+                height = quality[:-1] if 'p' in quality else "1080"
+                if audio_only:
+                    q_fmt = "bestaudio/best"
+                else:
+                    # Formato más robusto con fallback para plataformas como Facebook/TikTok
+                    q_fmt = f"bestvideo[height<={height}]+bestaudio/best[height<={height}]/best"
                 
                 download_path = Path(download_dir)
                 download_path.mkdir(exist_ok=True)
@@ -465,20 +469,29 @@ elif page == "Crear Clips YouTube":
                 with st.spinner("Procesando..."):
                     try:
                         temp_dir = Path("temp_clips"); temp_dir.mkdir(exist_ok=True)
-                        video_id = info.get('id', 'unknown')
+                        video_id = info.get('id') or info.get('display_id') or 'unknown'
+                        
+                        # Si sigue siendo unknown, intentar extraer de la URL como último recurso
+                        if video_id == 'unknown' and st.session_state.current_clip_url:
+                            import re
+                            yt_id = re.search(r'(?:v=|\/)([0-9A-Za-z_-]{11})(?:[&?]|$)', st.session_state.current_clip_url)
+                            if yt_id: video_id = yt_id.group(1)
                         
                         downloaded_path = None
                         # Búsqueda robusta: Si existe cualquier archivo con este ID en la carpeta temp
                         possible_cached = list(temp_dir.glob(f"{video_id}.*"))
+                        print(f"DEBUG: Buscando ID {video_id} en {temp_dir.absolute()}. Encontrados: {len(possible_cached)}")
                         
                         if possible_cached:
                             downloaded_path = str(possible_cached[0])
-                            st.caption(f"⚡ Video detectado en local: {possible_cached[0].name}")
+                            st.info(f"⚡ Video recuperado del disco: {possible_cached[0].name}")
+                            print(f"DEBUG: Cache HIT para {video_id}")
                         else:
+                            print(f"DEBUG: Cache MISS para {video_id}. Iniciando descarga...")
                             # Descargar si no está en cache local
                             outtmpl = str(temp_dir / f"{video_id}.%(ext)s")
                             ydl_opts = {
-                                'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+                                'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]/best',
                                 'outtmpl': outtmpl,
                                 'restrictfilenames': True
                             }
